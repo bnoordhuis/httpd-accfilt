@@ -1,0 +1,6 @@
+*.l[oa]
+*.[oa]
+.deps/
+.libs/
+/httpd-accfilt
+/httpd-nofilt
