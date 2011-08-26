@@ -2,7 +2,7 @@ CC	= gcc
 CFLAGS	= -I. -Iev -Wall -Wextra -Wno-unused-parameter
 LDFLAGS	= -lm
 
-REL_CFLAGS	= -O2 -Os
+REL_CFLAGS	= -O3
 DBG_CFLAGS	= -O0 -g
 
 OBJS	= http_parser.o
