@@ -14,6 +14,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -23,6 +27,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -257,6 +262,12 @@ int main(int argc, char **argv) {
     int yes = 1;
     E(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes));
   }
+#if defined(HAVE_ACCFILT) && defined(TCP_DEFER_ACCEPT)
+  {
+    int timeout = 60;
+    E(setsockopt(sockfd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &timeout, sizeof timeout));
+  }
+#endif
   {
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof addr);
