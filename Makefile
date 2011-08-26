@@ -5,7 +5,7 @@ LDFLAGS	= -lm
 REL_CFLAGS	= -O2 -Os
 DBG_CFLAGS	= -O0 -g
 
-OBJS	= httpd.o http_parser.o
+OBJS	= http_parser.o
 LIBEV	= ev/.libs/libev.a
 
 .PHONY:	all ev clean
@@ -18,12 +18,16 @@ release:	build
 debug:	CFLAGS += $(DBG_CFLAGS)
 debug:	build
 
-build:	$(OBJS)	$(LIBEV)
-	$(CC) -DHAVE_ACCFILT -o httpd-accfilt $^ $(LDFLAGS)
-	$(CC) -UHAVE_ACCFILT -o httpd-nofilt $^ $(LDFLAGS)
+build:	httpd-accfilt httpd-nofilt
+
+httpd-accfilt:	$(OBJS) httpd-accfilt.o $(LIBEV)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+httpd-nofilt:	$(OBJS) httpd-nofilt.o $(LIBEV)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
-	rm -f $(OBJS) httpd-accfilt httpd-nofilt
+	rm -f $(OBJS) httpd-accfilt.o httpd-nofilt.o httpd-accfilt httpd-nofilt
 
 distclean:	clean
 	cd ev && $(MAKE) distclean
@@ -36,3 +40,9 @@ ev/Makefile:	ev/configure
 
 ev/configure:
 	cd ev && sh autogen.sh
+
+httpd-accfilt.o:	httpd.c
+	$(CC) $(CFLAGS) -DHAVE_ACCFILT -o $@ -c $<
+
+httpd-nofilt.o:	httpd.c
+	$(CC) $(CFLAGS) -UHAVE_ACCFILT -o $@ -c $<
